@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP Implementation Mastery — Avik Bhattacharya</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #0D1B3E;
+    --navy-mid: #1B3A6B;
+    --navy-light: #2B4F8C;
+    --gold: #C8952A;
+    --gold-light: #F0B93A;
+    --gold-pale: #FDF3E7;
+    --teal: #0E7C7B;
+    --teal-light: #14A5A4;
+    --red: #B83C00;
+    --green: #1A6B3A;
+    --green-light: #22A355;
+    --slate: #4A5568;
+    --silver: #CBD5E0;
+    --white: #FFFFFF;
+    --off-white: #F8FAFC;
+    --text: #1A202C;
+    --bg: #060E24;
+    --card: #0F1E3D;
+    --card2: #132040;
+    --border: rgba(200,149,42,0.25);
+    --glow: rgba(200,149,42,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ── GRID BG ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,149,42,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,149,42,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(6,14,36,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+  }
+
+  nav .inner {
+    max-width: 1140px; margin: 0 auto; padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+  }
+
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem; font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 100px 0 60px;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -200px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(200,149,42,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    bottom: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(14,124,123,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(200,149,42,0.12);
+    border: 1px solid rgba(200,149,42,0.4);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.75rem; font-weight: 500;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.6)} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .hero h1 .accent { color: var(--gold); }
+  .hero h1 .thin { font-weight: 400; color: rgba(255,255,255,0.55); }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.6);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.88rem;
+    padding: 13px 26px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,149,42,0.35); }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600; font-size: 0.88rem;
+    padding: 13px 26px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── HERO STATS STRIP ── */
+  .hero-stats {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 60px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .hero-stat {
+    background: var(--card);
+    padding: 28px 24px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+  .hero-stat:hover { background: var(--card2); }
+
+  .hero-stat .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.4rem; font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .hero-stat .lbl {
+    font-size: 0.78rem; color: rgba(255,255,255,0.5);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── SECTION ── */
+  section { padding: 96px 0; position: relative; }
+
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--teal-light);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .section-tag::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--teal-light);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .section-title .gold { color: var(--gold); }
+
+  .section-desc {
+    color: rgba(255,255,255,0.55);
+    font-size: 1rem;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover { border-color: rgba(200,149,42,0.5); transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+  .card:hover::before { opacity: 1; }
+
+  .card-icon {
+    width: 48px; height: 48px;
+    background: rgba(200,149,42,0.12);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+
+  .card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .card p { font-size: 0.9rem; color: rgba(255,255,255,0.55); line-height: 1.65; }
+
+  /* ── STAT CARDS ── */
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    text-align: center;
+    transition: all 0.25s;
+  }
+
+  .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(0,0,0,0.4); border-color: rgba(200,149,42,0.5); }
+
+  .stat-card .big {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem; font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .big.gold { color: var(--gold); }
+  .stat-card .big.teal { color: var(--teal-light); }
+  .stat-card .big.green { color: var(--green-light); }
+  .stat-card .big.red { color: #E05A30; }
+
+  .stat-card .stat-label {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.4;
+  }
+
+  .stat-card .stat-source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.25);
+    margin-top: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── GRIDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+  }
+
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .chart-sub {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 24px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 40px; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--gold), var(--teal-light), var(--gold));
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 36px;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -33px; top: 5px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 4px rgba(200,149,42,0.15);
+  }
+
+  .tl-phase {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .tl-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem; font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .tl-body {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+  }
+
+  .tl-duration {
+    display: inline-block;
+    background: rgba(14,124,123,0.15);
+    border: 1px solid rgba(14,124,123,0.3);
+    color: var(--teal-light);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    padding: 3px 10px; border-radius: 100px;
+    margin-top: 8px;
+  }
+
+  /* ── PROGRESS BARS ── */
+  .progress-item { margin-bottom: 18px; }
+
+  .progress-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label { font-size: 0.85rem; color: rgba(255,255,255,0.75); }
+  .progress-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    color: var(--gold);
+  }
+
+  .progress-track {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 100px;
+    position: relative;
+    transition: width 1.5s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .data-table thead th {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 14px 16px;
+    background: rgba(200,149,42,0.08);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .data-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.15s;
+  }
+
+  .data-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+  .data-table tbody td {
+    padding: 13px 16px;
+    color: rgba(255,255,255,0.75);
+    vertical-align: middle;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-gold { background: rgba(200,149,42,0.15); color: var(--gold-light); }
+  .badge-green { background: rgba(34,163,85,0.15); color: var(--green-light); }
+  .badge-red { background: rgba(184,60,0,0.15); color: #E05A30; }
+  .badge-teal { background: rgba(14,124,123,0.15); color: var(--teal-light); }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin: 32px 0;
+  }
+
+  .kpi-pill {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    flex: 1; min-width: 180px;
+  }
+
+  .kpi-pill .kpi-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem; font-weight: 800;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .kpi-pill .kpi-text {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.35;
+  }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    background: rgba(200,149,42,0.06);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+
+  .quote-block p {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  .quote-block cite {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    margin-top: 10px;
+    letter-spacing: 0.06em;
+    font-style: normal;
+  }
+
+  /* ── AUTHOR CARD ── */
+  .author-card {
+    background: linear-gradient(135deg, rgba(27,58,107,0.6) 0%, rgba(14,124,123,0.2) 100%);
+    border: 1px solid rgba(200,149,42,0.3);
+    border-radius: 20px;
+    padding: 40px;
+    display: flex; gap: 36px; align-items: flex-start;
+  }
+
+  .author-avatar {
+    width: 80px; height: 80px; min-width: 80px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem; font-weight: 800;
+    color: var(--navy);
+  }
+
+  .author-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem; font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .author-title {
+    color: var(--gold);
+    font-size: 0.88rem; margin-bottom: 12px;
+  }
+
+  .author-desc {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.65;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: rgba(255,255,255,0.02);
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    text-align: center;
+  }
+
+  footer p { font-size: 0.82rem; color: rgba(255,255,255,0.3); }
+  footer strong { color: var(--gold); font-weight: 600; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
+
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RISK / BENEFIT ICONS ── */
+  .risk-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .risk-item:last-child { border-bottom: none; }
+
+  .risk-icon {
+    width: 36px; height: 36px; min-width: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+
+  .risk-icon.warn { background: rgba(184,60,0,0.15); }
+  .risk-icon.ok { background: rgba(34,163,85,0.15); }
+
+  .risk-text strong { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 3px; }
+  .risk-text span { font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+
+  /* ── MARKET SECTION ── */
+  .market-highlight {
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem; font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.7);
+  }
+  .checklist li::before {
+    content: '✓';
+    display: flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; min-width: 20px;
+    background: rgba(34,163,85,0.2);
+    color: var(--green-light);
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  /* ── ROI CALC VISUAL ── */
+  .roi-visual {
+    display: flex; align-items: center; gap: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .roi-col {
+    flex: 1;
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  .roi-col:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+
+  .roi-col .roi-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem; font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .roi-col .roi-lbl { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .hero-stats { grid-template-columns: repeat(2,1fr); }
+    .author-card { flex-direction: column; }
+    .roi-visual { flex-direction: column; }
+    .roi-col:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="inner">
+    <div class="nav-logo">⚙ ERP · Implementation · Mastery</div>
+    <div class="nav-links">
+      <a href="#market">Market</a>
+      <a href="#stats">Statistics</a>
+      <a href="#phases">Phases</a>
+      <a href="#roi">ROI</a>
+      <a href="#risks">Risks</a>
+      <a href="#author">Author</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="container">
+    <div class="hero-badge">Enterprise Resource Planning · 2025 Edition</div>
+    <h1>
+      ERP Implementation<br>
+      <span class="accent">Mastery</span> <span class="thin">Repository</span>
+    </h1>
+    <p class="hero-sub">
+      A comprehensive, data-backed guide to planning, executing, and governing enterprise ERP implementations — built from real-world CoS experience across manufacturing, retail, and real estate verticals.
+    </p>
+    <div class="hero-actions">
+      <a href="#phases" class="btn-primary">↓ Explore the Framework</a>
+      <a href="#roi" class="btn-outline">View ROI Data</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">$136B</div>
+        <div class="lbl">Global ERP Market 2024</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">85%</div>
+        <div class="lbl">Success Rate with Expert Guidance</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">52%</div>
+        <div class="lbl">Average ROI on ERP Investment</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">78%</div>
+        <div class="lbl">Report Improved Productivity</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MARKET SECTION -->
+<section id="market">
+  <div class="container">
+    <div class="section-tag">Market Intelligence</div>
+    <h2 class="section-title">The ERP Market <span class="gold">at a Glance</span></h2>
+    <p class="section-desc">Real numbers from Panorama Consulting, Gartner, DocuClipper, and NetSuite — the most authoritative ERP research sources available in 2025.</p>
+
+    <div class="grid-3 fade-in" style="margin-bottom:20px;">
+      <div class="stat-card">
+        <div class="big gold">$136B</div>
+        <div class="stat-label">Global ERP market size in 2024 — a 9.4% YoY increase</div>
+        <div class="stat-source">Source: NetSuite / DocuClipper 2024</div>
+      </div>
+      <div class="stat-card">
+        <div class="big teal">$180B</div>
+        <div class="stat-label">Projected ERP market by 2029 at 5.7% CAGR</div>
+        <div class="stat-source">Source: Industry Analysts 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="big green">70.4%</div>
+        <div class="stat-label">Of all ERP deployments now cloud-based (2024)</div>
+        <div class="stat-source">Source: DocuClipper 2024</div>
+      </div>
+    </div>
+
+    <div class="grid-4 fade-in">
+      <div class="stat-card">
+        <div class="big gold">78.6%</div>
+        <div class="stat-label">New implementations chose cloud solutions (2024)</div>
+        <div class="stat-source">Panorama Consulting 2024</div>
+      </div>
+      <div class="stat-card">
+        <div class="big teal">65%</div>
+        <div class="stat-label">Organizations consider AI critical to their ERP system</div>
+        <div class="stat-source">BlueLinker ERP 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="big gold">7.1%</div>
+        <div class="stat-label">CAGR — ERP market growth through 2034</div>
+        <div class="stat-source">CFO Club 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="big green">61%</div>
+        <div class="stat-label">Organizations chose ERP as their primary transformation vehicle</div>
+        <div class="stat-source">Panorama Consulting 2024</div>
+      </div>
+    </div>
+
+    <!-- Market growth chart -->
+    <div style="margin-top:40px;" class="fade-in">
+      <div class="chart-wrap">
+        <div class="chart-title">ERP Global Market Growth Trajectory</div>
+        <div class="chart-sub">$ Billions USD · 2023 → 2034 Projection</div>
+        <canvas id="marketChart" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- STATS SECTION -->
+<section id="stats">
+  <div class="container">
+    <div class="section-tag">Implementation Statistics</div>
+    <h2 class="section-title">Success, Failure & <span class="gold">Everything Between</span></h2>
+    <p class="section-desc">The honest data — what works, what fails, and what separates exceptional ERP projects from expensive disasters.</p>
+
+    <div class="grid-2 fade-in">
+      <!-- Success factors -->
+      <div class="chart-wrap">
+        <div class="chart-title">Critical Success Factors</div>
+        <div class="chart-sub">% of successful implementers citing each factor</div>
+        <div style="margin-top:8px;">
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Expert Consultant Engagement</span><span class="progress-val">85%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:85%;background:linear-gradient(90deg,#C8952A,#F0B93A);"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Leadership & Institutional Support</span><span class="progress-val">77%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:77%;background:linear-gradient(90deg,#0E7C7B,#14A5A4);"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Effective Stakeholder Communication</span><span class="progress-val">60%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:60%;background:linear-gradient(90deg,#1A6B3A,#22A355);"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Pre-Implementation ROI Analysis</span><span class="progress-val">83%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:83%;background:linear-gradient(90deg,#C8952A,#F0B93A);"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Projects Completed On Time</span><span class="progress-val">63.4%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:63%;background:linear-gradient(90deg,#0E7C7B,#14A5A4);"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">ROI Expectations Met (1yr+ Live)</span><span class="progress-val">83%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:83%;background:linear-gradient(90deg,#1A6B3A,#22A355);"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Failure reasons -->
+      <div class="chart-wrap">
+        <div class="chart-title">Top Causes of Budget Overruns</div>
+        <div class="chart-sub">Primary failure drivers — Panorama Consulting 2024</div>
+        <canvas id="failureChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="kpi-strip fade-in" style="margin-top:32px;">
+      <div class="kpi-pill">
+        <div class="kpi-num">50%</div>
+        <div class="kpi-text">First-attempt failure rate industry-wide</div>
+      </div>
+      <div class="kpi-pill">
+        <div class="kpi-num">55–75%</div>
+        <div class="kpi-text">Fail due to extended timelines or budget — Gartner</div>
+      </div>
+      <div class="kpi-pill">
+        <div class="kpi-num">51%</div>
+        <div class="kpi-text">Experience operational disruptions at go-live</div>
+      </div>
+      <div class="kpi-pill">
+        <div class="kpi-num">30%</div>
+        <div class="kpi-text">Timeline extensions beyond original schedule</div>
+      </div>
+    </div>
+
+    <!-- Deployment approaches -->
+    <div style="margin-top:32px;" class="fade-in">
+      <div class="chart-wrap">
+        <div class="chart-title">Implementation Approach Preferences</div>
+        <div class="chart-sub">How organizations choose to deploy — DocuClipper 2024</div>
+        <canvas id="approachChart" height="90"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PHASES -->
+<section id="phases">
+  <div class="container">
+    <div class="section-tag">Implementation Framework</div>
+    <h2 class="section-title">The 7-Phase <span class="gold">Implementation Roadmap</span></h2>
+    <p class="section-desc">A structured, governance-first approach to ERP implementation drawn from real-world execution across multi-vertical organizations.</p>
+
+    <div class="grid-2 fade-in">
+      <div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-phase">Phase 01</div>
+            <div class="tl-title">Discovery & Requirements Analysis</div>
+            <div class="tl-body">Map existing processes, identify pain points, define strategic objectives, and align all HODs on system expectations. This is where 55–75% of failures originate — skipping rigorous discovery.</div>
+            <div class="tl-duration">2–4 Weeks</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Phase 02</div>
+            <div class="tl-title">Vendor Selection & Project Planning</div>
+            <div class="tl-body">Evaluate ERP vendors against business requirements. Establish project governance structure, executive sponsor, cross-functional team, budget, and KPI baseline. Get leadership buy-in formally.</div>
+            <div class="tl-duration">3–6 Weeks</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Phase 03</div>
+            <div class="tl-title">System Design & Configuration</div>
+            <div class="tl-body">Configure the ERP to match business workflows. Define customizations (45% of businesses choose moderate customization). Finalize data migration mapping and integration architecture.</div>
+            <div class="tl-duration">4–8 Weeks</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Phase 04</div>
+            <div class="tl-title">Data Migration & Cleansing</div>
+            <div class="tl-body">Audit, cleanse, and migrate data from legacy systems. Address inaccuracies, duplicates, and format incompatibilities. Data quality issues are the 3rd most common budget overrun cause (34%).</div>
+            <div class="tl-duration">4–10 Weeks</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-phase">Phase 05</div>
+            <div class="tl-title">Testing & Quality Assurance</div>
+            <div class="tl-body">Functional, performance, security, and UAT testing in sandbox environments. Iterate and fix defects. Validate against KPIs set in Phase 01. Parallel run with legacy if phased approach.</div>
+            <div class="tl-duration">3–6 Weeks</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Phase 06</div>
+            <div class="tl-title">Training & Change Management</div>
+            <div class="tl-body">Develop role-based training programs. Execute change management plan addressing resistance. Train power users first to mentor others. Communication cascade across all user groups.</div>
+            <div class="tl-duration">3–5 Weeks</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Phase 07</div>
+            <div class="tl-title">Go-Live & Continuous Optimization</div>
+            <div class="tl-body">Deploy with hypercare support. Monitor KPIs daily for first 90 days. Gather end-user feedback continuously. 68% of organizations see measurable ROI within Year 1 with proper go-live governance.</div>
+            <div class="tl-duration">Ongoing</div>
+          </div>
+        </div>
+
+        <div class="quote-block" style="margin-top:8px;">
+          <p>"ERP implementation is an operational transformation, not just a software installation. Each phase sets up the foundation for how teams will operate for years."</p>
+          <cite>— Panorama Consulting Group, 2024 ERP Report</cite>
+        </div>
+      </div>
+    </div>
+
+    <!-- Implementation timelines table -->
+    <div style="margin-top:40px;" class="fade-in">
+      <div class="chart-wrap">
+        <div class="chart-title">Implementation Timeline by Organization Size</div>
+        <div class="chart-sub">Industry benchmarks — RubinBrown ERP Advisory / Anchor Group 2025</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Organization Type</th>
+              <th>Typical Timeline</th>
+              <th>Team Size</th>
+              <th>Approach</th>
+              <th>Success Rate</th>
+              <th>Risk Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SMB (under $50M revenue)</td>
+              <td>3–6 months</td>
+              <td>5–10 members</td>
+              <td><span class="badge badge-teal">Phased</span></td>
+              <td>76%</td>
+              <td><span class="badge badge-green">LOW</span></td>
+            </tr>
+            <tr>
+              <td>Mid-Market ($50M–$500M)</td>
+              <td>6–12 months</td>
+              <td>10–30 members</td>
+              <td><span class="badge badge-gold">Hybrid</span></td>
+              <td>72%</td>
+              <td><span class="badge badge-gold">MEDIUM</span></td>
+            </tr>
+            <tr>
+              <td>Large Enterprise ($500M+)</td>
+              <td>12–18 months</td>
+              <td>30–100 members</td>
+              <td><span class="badge badge-teal">Phased</span></td>
+              <td>65%</td>
+              <td><span class="badge badge-gold">MEDIUM</span></td>
+            </tr>
+            <tr>
+              <td>Multi-Vertical Conglomerate</td>
+              <td>18–36 months</td>
+              <td>50–200 members</td>
+              <td><span class="badge badge-gold">Hybrid</span></td>
+              <td>58%</td>
+              <td><span class="badge badge-red">HIGH</span></td>
+            </tr>
+            <tr>
+              <td>Global MNC / Multinational</td>
+              <td>24–48 months</td>
+              <td>100–500 members</td>
+              <td><span class="badge badge-red">Big Bang</span></td>
+              <td>52%</td>
+              <td><span class="badge badge-red">VERY HIGH</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ROI SECTION -->
+<section id="roi">
+  <div class="container">
+    <div class="section-tag">Return on Investment</div>
+    <h2 class="section-title">ROI, Benefits & <span class="gold">Business Impact</span></h2>
+    <p class="section-desc">The financial case for ERP — backed by real data from Nucleus Research, Gartner, and Panorama Consulting Group 2025.</p>
+
+    <!-- ROI Visual Strip -->
+    <div class="roi-visual fade-in" style="margin-bottom:40px;">
+      <div class="roi-col">
+        <div class="roi-num" style="color:var(--gold);">52%</div>
+        <div class="roi-lbl">Average ROI — $1.52 returned per $1 invested</div>
+      </div>
+      <div class="roi-col">
+        <div class="roi-num" style="color:var(--teal-light);">2.5 yrs</div>
+        <div class="roi-lbl">Typical ERP payback period</div>
+      </div>
+      <div class="roi-col">
+        <div class="roi-num" style="color:var(--green-light);">4.01x</div>
+        <div class="roi-lbl">Cloud ERP ROI vs on-premise (Nucleus Research)</div>
+      </div>
+      <div class="roi-col">
+        <div class="roi-num" style="color:var(--gold);">68%</div>
+        <div class="roi-lbl">See measurable ROI within Year 1 of go-live</div>
+      </div>
+    </div>
+
+    <div class="grid-2 fade-in">
+      <!-- Benefits chart -->
+      <div class="chart-wrap">
+        <div class="chart-title">Business Benefits Realized Post-ERP</div>
+        <div class="chart-sub">% of organizations reporting each benefit — Jacopo ERP Stats 2025</div>
+        <canvas id="benefitsChart" height="220"></canvas>
+      </div>
+
+      <!-- ROI Goals -->
+      <div class="chart-wrap">
+        <div class="chart-title">Primary ROI Goals (2024 Survey)</div>
+        <div class="chart-sub">Top business objectives for ERP investment</div>
+        <canvas id="goalsChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="quote-block fade-in" style="margin-top:32px;">
+      <p>"Organizations that modernize ERP environments to a composable, cloud-based architecture realize up to 30% faster time-to-value and 20% higher process efficiency compared with those maintaining legacy core systems."</p>
+      <cite>— Gartner 2024 ERP Value Study</cite>
+    </div>
+
+    <!-- Real-world ROI Examples -->
+    <div style="margin-top:40px;" class="fade-in">
+      <div class="chart-wrap">
+        <div class="chart-title">Real-World ERP ROI Case Studies</div>
+        <div class="chart-sub">Documented outcomes from live implementations — Rand Group / Industry Research 2025</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Company / Sector</th>
+              <th>ERP Platform</th>
+              <th>Key Outcome</th>
+              <th>ROI Metric</th>
+              <th>Payback</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Beverage Manufacturer (Cirkul)</td>
+              <td><span class="badge badge-teal">MS Business Central</span></td>
+              <td>Month-end close reduced to 1 week</td>
+              <td><span style="color:var(--green-light);font-weight:700;">20x ROI</span></td>
+              <td>&lt; 12 months</td>
+            </tr>
+            <tr>
+              <td>Oilfield Services (Conquest)</td>
+              <td><span class="badge badge-gold">Dynamics 365</span></td>
+              <td>A/R staff reduced from 7 to 2.5; DSO cut 15→3 days</td>
+              <td><span style="color:var(--green-light);font-weight:700;">3x PO speed</span></td>
+              <td>18 months</td>
+            </tr>
+            <tr>
+              <td>Professional Services Firm</td>
+              <td><span class="badge badge-teal">Cloud ERP</span></td>
+              <td>Monthly close time reduced by 50%</td>
+              <td><span style="color:var(--green-light);font-weight:700;">50% faster close</span></td>
+              <td>12 months</td>
+            </tr>
+            <tr>
+              <td>Mid-Size Distributor ($50M)</td>
+              <td><span class="badge badge-gold">NetSuite</span></td>
+              <td>$75K–$180K annual labor savings; 20–30% inventory cost reduction</td>
+              <td><span style="color:var(--green-light);font-weight:700;">90% 5-yr ROI</span></td>
+              <td>2–3 years</td>
+            </tr>
+            <tr>
+              <td>Manufacturing Sector (Avg.)</td>
+              <td><span class="badge badge-teal">Various</span></td>
+              <td>20% improvement in forecasting accuracy; 15% cost reduction</td>
+              <td><span style="color:var(--green-light);font-weight:700;">AI-ERP enabled</span></td>
+              <td>2.5 years</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- RISKS & BEST PRACTICES -->
+<section id="risks">
+  <div class="container">
+    <div class="section-tag">Risk Management & Best Practices</div>
+    <h2 class="section-title">Risks, Pitfalls & <span class="gold">How to Win</span></h2>
+    <p class="section-desc">The governance intelligence that separates the 85% success group from the 50% failure group.</p>
+
+    <div class="grid-2 fade-in">
+      <div class="card">
+        <div class="card-icon">⚠️</div>
+        <h3>Critical Risk Factors</h3>
+        <div class="risk-item">
+          <div class="risk-icon warn">🔴</div>
+          <div class="risk-text">
+            <strong>Underestimating Staffing (38%)</strong>
+            <span>Top cause of budget overruns — never run lean on implementation resources</span>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-icon warn">🔴</div>
+          <div class="risk-text">
+            <strong>Scope Creep (35%)</strong>
+            <span>Define and freeze scope before build begins. Every addition costs 2x later.</span>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-icon warn">🔴</div>
+          <div class="risk-text">
+            <strong>Technical & Data Issues (34%)</strong>
+            <span>Poor data migration planning — cleanse before you migrate, always</span>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-icon warn">🔴</div>
+          <div class="risk-text">
+            <strong>User Resistance (Change Management)</strong>
+            <span>51% of companies experience go-live disruptions — train early, communicate why</span>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-icon warn">🔴</div>
+          <div class="risk-text">
+            <strong>Underestimating Total Cost (30–50%)</strong>
+            <span>Most companies underestimate by 30–50% — budget $7,200/user over 5 years</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">✅</div>
+        <h3>Winning Practices</h3>
+        <ul class="checklist">
+          <li>Engage specialist ERP consultants — raises success rate from 27% to 85%</li>
+          <li>Secure executive sponsor commitment before the first meeting</li>
+          <li>Conduct formal ROI analysis — 83% who do this meet their expectations</li>
+          <li>Choose phased rollout (58.5% prefer this) over big bang to reduce risk</li>
+          <li>Define KPIs in Phase 0 — measure before, during, and after</li>
+          <li>Appoint a dedicated CoS / Project Director to own cross-departmental alignment</li>
+          <li>Cleanse all data before migration — never migrate dirty data</li>
+          <li>Build hypercare support (60–90 days post go-live) into project plan</li>
+          <li>Train power users first — they become internal champions and mentors</li>
+          <li>Treat ERP as a living system — budget for continuous improvement annually</li>
+          <li>Establish a weekly governance cadence throughout the project lifecycle</li>
+          <li>Build a formal change management plan with structured communication cascade</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- AI and Future -->
+    <div style="margin-top:32px;" class="fade-in">
+      <div class="chart-wrap">
+        <div class="chart-title">AI Integration Impact on ERP Performance</div>
+        <div class="chart-sub">Organizations implementing AI-enabled ERP systems report the following improvements — DocuClipper / BlueLinker 2025</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px;">
+          <div style="text-align:center;padding:20px 12px;">
+            <div style="font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:var(--gold);">20%</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:6px;">Improvement in forecasting accuracy</div>
+          </div>
+          <div style="text-align:center;padding:20px 12px;">
+            <div style="font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:var(--teal-light);">15%</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:6px;">Reduction in operational costs</div>
+          </div>
+          <div style="text-align:center;padding:20px 12px;">
+            <div style="font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:var(--green-light);">35%</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:6px;">Improvement in decision-making speed</div>
+          </div>
+          <div style="text-align:center;padding:20px 12px;">
+            <div style="font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:var(--gold);">30%</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:6px;">Efficiency gain via RPA integration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- KPI GOVERNANCE SECTION (Avik's expertise) -->
+<section>
+  <div class="container">
+    <div class="section-tag">KPI Governance Framework</div>
+    <h2 class="section-title">Measuring ERP <span class="gold">Implementation Success</span></h2>
+    <p class="section-desc">The governance KPIs every implementation director must track — before, during, and after go-live.</p>
+
+    <div class="grid-3 fade-in">
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Project Health KPIs</h3>
+        <ul class="checklist" style="margin-top:8px;">
+          <li>Milestone completion rate vs plan</li>
+          <li>Budget burn rate (weekly tracking)</li>
+          <li>Issue / risk register age</li>
+          <li>Scope change requests logged</li>
+          <li>Stakeholder sign-off velocity</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚙️</div>
+        <h3>Operational KPIs (Post Go-Live)</h3>
+        <ul class="checklist" style="margin-top:8px;">
+          <li>Month-end close cycle time</li>
+          <li>Inventory accuracy rate</li>
+          <li>Order fulfilment lead time</li>
+          <li>Manual process elimination %</li>
+          <li>Data error rate vs baseline</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <h3>Adoption KPIs</h3>
+        <ul class="checklist" style="margin-top:8px;">
+          <li>Daily active user count</li>
+          <li>Transactions completed per user</li>
+          <li>Support ticket volume trend</li>
+          <li>Training completion rate</li>
+          <li>User satisfaction score (CSAT)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- AUTHOR SECTION -->
+<section id="author">
+  <div class="container">
+    <div class="author-card fade-in">
+      <div class="author-avatar">AB</div>
+      <div>
+        <div class="author-name">Avik Bhattacharya</div>
+        <div class="author-title">Chief of Staff — Director's Office, Donear Group of Industries</div>
+        <div class="author-desc">
+          19+ years of progressive executive leadership across manufacturing, retail, real estate, infrastructure, and technology conglomerates. Currently driving ERP implementation governance, KPI framework design, Business Excellence systems, and enterprise-wide digital transformation across 3 business verticals at Donear Group — a multi-vertical conglomerate with manufacturing, retail, and real estate operations.<br><br>
+          This repository is built from real-world ERP governance experience — the systems, frameworks, and lessons from leading complex implementation programs at the Chief of Staff level, reporting directly to the Director.
+        </div>
+        <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+          <span class="badge badge-gold">Chief of Staff</span>
+          <span class="badge badge-teal">ERP Governance</span>
+          <span class="badge badge-green">Business Excellence</span>
+          <span class="badge badge-gold">KPI Frameworks</span>
+          <span class="badge badge-teal">Change Management</span>
+          <span class="badge badge-green">MIS Architecture</span>
+        </div>
+        <div style="margin-top:20px;font-size:0.82rem;color:rgba(255,255,255,0.35);font-family:'JetBrains Mono',monospace;">
+          avikatb@gmail.com · +91 7001015488 · Mumbai, India · linkedin.com/in/avik-bhattacharya-57a77a85
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>Built with real-world CoS intelligence · <strong>Avik Bhattacharya</strong> · ERP Implementation Mastery Repository · 2025</p>
+    <p style="margin-top:8px;">Data sources: Panorama Consulting · Gartner · NetSuite · DocuClipper · BlueLinker ERP · Nucleus Research · SAP · Rand Group</p>
+  </div>
+</footer>
+
+<script>
+// ── CHARTS ──────────────────────────────────────────────────────────────
+Chart.defaults.color = 'rgba(255,255,255,0.5)';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+const gold = '#C8952A';
+const goldL = '#F0B93A';
+const teal = '#0E7C7B';
+const tealL = '#14A5A4';
+const green = '#22A355';
+const red = '#E05A30';
+const navy = '#2B4F8C';
+
+// Market Growth Line Chart
+new Chart(document.getElementById('marketChart'), {
+  type: 'line',
+  data: {
+    labels: ['2023','2024','2025','2026','2027','2028','2029','2030','2034'],
+    datasets: [{
+      label: 'Global ERP Market ($B)',
+      data: [51.6, 135.9, 71.6, 80, 90, 100, 179.8, 140, 110],
+      borderColor: gold,
+      backgroundColor: 'rgba(200,149,42,0.08)',
+      fill: true,
+      tension: 0.4,
+      borderWidth: 2.5,
+      pointBackgroundColor: gold,
+      pointRadius: 5,
+      pointHoverRadius: 8
+    },{
+      label: 'Cloud ERP Market ($B)',
+      data: [null, 87.73, 47.25, 55, 65, 75, 172.74, 117, null],
+      borderColor: tealL,
+      backgroundColor: 'rgba(14,124,123,0.06)',
+      fill: true,
+      tension: 0.4,
+      borderWidth: 2,
+      pointBackgroundColor: tealL,
+      pointRadius: 5,
+      borderDash: [4,4]
+    }]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { labels: { color: 'rgba(255,255,255,0.6)', padding: 20, usePointStyle: true } }
+    },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.4)' } },
+      y: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: 'rgba(255,255,255,0.4)', callback: v => '$' + v + 'B' }
+      }
+    }
+  }
+});
+
+// Failure Causes - Horizontal Bar
+new Chart(document.getElementById('failureChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Understaffed Teams','Scope Expansion','Technical/Data Issues','Poor Project Mgmt','Change Resistance'],
+    datasets: [{
+      label: '% of Budget Overruns',
+      data: [38, 35, 34, 57, 40],
+      backgroundColor: [
+        'rgba(224,90,48,0.7)',
+        'rgba(200,149,42,0.7)',
+        'rgba(91,33,182,0.7)',
+        'rgba(224,90,48,0.85)',
+        'rgba(14,124,123,0.7)'
+      ],
+      borderColor: ['#E05A30','#C8952A','#7C3AED','#E05A30','#0E7C7B'],
+      borderWidth: 1.5,
+      borderRadius: 6
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: 'rgba(255,255,255,0.4)', callback: v => v + '%' },
+        max: 70
+      },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11 } } }
+    }
+  }
+});
+
+// Approach - Doughnut
+new Chart(document.getElementById('approachChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Phased Rollout','Big Bang','Hybrid Approach'],
+    datasets: [{
+      data: [58.5, 20.8, 20.8],
+      backgroundColor: ['rgba(200,149,42,0.75)','rgba(224,90,48,0.7)','rgba(14,124,123,0.7)'],
+      borderColor: ['#C8952A','#E05A30','#0E7C7B'],
+      borderWidth: 1.5,
+      hoverOffset: 10
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '68%',
+    plugins: {
+      legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.6)', padding: 20, usePointStyle: true } }
+    }
+  }
+});
+
+// Benefits - Horizontal Bar
+new Chart(document.getElementById('benefitsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Optimized Inventory','Improved Productivity','Eliminated Data Silos','Reduced Costs','Supplier Collaboration','Compliance Improved','Better Customer Exp.','Security Improved'],
+    datasets: [{
+      label: '% of Organizations',
+      data: [91, 78, 77, 62, 76, 75, 70, 94],
+      backgroundColor: [
+        'rgba(200,149,42,0.7)','rgba(20,165,164,0.7)','rgba(34,163,85,0.7)',
+        'rgba(200,149,42,0.6)','rgba(14,124,123,0.7)','rgba(34,163,85,0.6)',
+        'rgba(91,33,182,0.7)','rgba(14,124,123,0.8)'
+      ],
+      borderRadius: 6,
+      borderWidth: 0
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: 'rgba(255,255,255,0.4)', callback: v => v + '%' },
+        max: 100
+      },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10 } } }
+    }
+  }
+});
+
+// ROI Goals - Pie
+new Chart(document.getElementById('goalsChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Cost Savings','Better KPIs','Support Growth','New Technology','Compliance','Replace Legacy'],
+    datasets: [{
+      data: [46, 46, 36, 28, 12, 39],
+      backgroundColor: [
+        'rgba(200,149,42,0.8)','rgba(14,124,123,0.75)','rgba(34,163,85,0.75)',
+        'rgba(91,33,182,0.7)','rgba(224,90,48,0.7)','rgba(27,58,107,0.8)'
+      ],
+      borderColor: ['#C8952A','#0E7C7B','#22A355','#5B21B6','#E05A30','#1B3A6B'],
+      borderWidth: 1.5,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '62%',
+    plugins: {
+      legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.6)', padding: 12, usePointStyle: true, font: { size: 11 } } }
+    }
+  }
+});
+
+// ── SCROLL ANIMATIONS ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ── COUNTER ANIMATION ──
+function animateCount(el, target, suffix = '', decimals = 0) {
+  let start = 0; const dur = 1800;
+  const step = timestamp => {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = (ease * target).toFixed(decimals) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+const heroObs = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    document.querySelectorAll('.hero-stat .num').forEach(el => {
+      const txt = el.textContent;
+      if (txt.includes('$136B')) animateCount(el, 136, 'B', 0), el.textContent = '$' + el.textContent;
+      if (txt.includes('85%')) animateCount(el, 85, '%', 0);
+      if (txt.includes('52%')) animateCount(el, 52, '%', 0);
+      if (txt.includes('78%')) animateCount(el, 78, '%', 0);
+    });
+    heroObs.disconnect();
+  }
+}, { threshold: 0.5 });
+
+const heroStats = document.querySelector('.hero-stats');
+if (heroStats) heroObs.observe(heroStats);
+</script>
+</body>
+</html>
